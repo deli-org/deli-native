@@ -5,7 +5,6 @@ import { InputItem, Button, Provider } from '@ant-design/react-native'
 import { useState, useEffect } from 'react'
 import * as Font from 'expo-font'
 import { api } from './app/utils'
-import AppLoading from 'expo-app-loading'
 
 const loadFonts = async () => {
   await Font.loadAsync(
@@ -18,6 +17,12 @@ const loadFonts = async () => {
     'antfill',
     // eslint-disable-next-line
     require('@ant-design/icons-react-native/fonts/antfill.ttf')
+  );
+
+  await Font.loadAsync(
+    'inter',
+    // eslint-disable-next-line
+    require('./assets/fonts/Inter-Medium.ttf')
   );
 }
 
@@ -35,26 +40,43 @@ export const App = () => {
   }
 
   useEffect(() => {
-    loadFonts()
-  })
+    const initializeApp = async () => {
+      await loadFonts()
+      setLoading(false)
+    }
+
+    initializeApp()
+  }, [])
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: "center" }}>
+        <Text>Loading fonts...</Text>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <InputItem
+        style={{ fontFamily: 'inter' }}
         value={username}
         placeholder="username"
         onChange={(value) => setUsername(value)}
         type="text">
       </InputItem>
       <InputItem
+        style={{ fontFamily: 'inter' }}
         type="password"
         value={password}
         placeholder="password"
         onChange={(value) => setPassword(value)}>
       </InputItem>
-      <Button onPress={() => submit()}>
-        Submit
+      <Button style={{ margin: 12 }} onPress={() => submit()}>
+        <Text style={{ fontFamily: 'inter', }}>
+          Submit
+        </Text>
       </Button>
     </View>
   );
