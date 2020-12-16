@@ -1,10 +1,15 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { Provider } from "react-redux";
 
 import App from "./app/index";
+import store from "./app/redux/store";
 
 const Root = () => {
-  return <App />;
+  return (
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
 };
 
 export default Root;

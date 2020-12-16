@@ -3,8 +3,9 @@ import * as Font from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
-import { api } from "./utils";
+import { sendCredentials } from "./redux/actions/login";
 
 const loadFonts = async () => {
   await Font.loadAsync(
@@ -30,11 +31,26 @@ export const App = () => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState(false);
+  const dispatch = useDispatch();
+
+  const loggedIn = useSelector((store) => store.login.loggedIn);
+  console.log(loggedIn);
 
   const submit = () => {
-    api.post("/login/", { username, password }).then((response) => {
-      console.log(response.data);
-    });
+    dispatch(sendCredentials(username, password, setAuthError));
+  };
+
+  const renderLoginError = () => {
+    if (!authError) {
+      return;
+    }
+
+    return (
+      <Text style={{ fontFamily: "inter", fontSize: 16, color: "red" }}>
+        Login Failed
+      </Text>
+    );
   };
 
   useEffect(() => {
@@ -58,6 +74,7 @@ export const App = () => {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <InputItem
+        error={authError}
         style={{ fontFamily: "inter" }}
         value={username}
         placeholder="username"
@@ -71,6 +88,7 @@ export const App = () => {
         placeholder="password"
         onChange={(value) => setPassword(value)}
       />
+      {renderLoginError()}
       <Button style={{ margin: 12 }} onPress={() => submit()}>
         <Text style={{ fontFamily: "inter" }}>Submit</Text>
       </Button>
