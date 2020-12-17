@@ -4,6 +4,7 @@ const defaultState = {
 };
 
 const loginReducer = (state = defaultState, action) => {
+  console.log(action);
   switch (action.type) {
     case "LOGIN_SUCCESS":
       return {
@@ -11,6 +12,9 @@ const loginReducer = (state = defaultState, action) => {
         loggedIn: true,
         token: action.token,
       };
+
+    case "LOGOUT":
+      return defaultState;
 
     default:
       return state;

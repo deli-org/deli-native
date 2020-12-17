@@ -1,11 +1,12 @@
-import { InputItem, Button } from "@ant-design/react-native";
 import * as Font from "expo-font";
-import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { sendCredentials } from "./redux/actions/login";
+import { loginSuccess } from "./redux/actions/login";
+import Login from "./screens/login";
+import SaleMenu from "./screens/sale-menu";
+import { getToken } from "./utils";
 
 const loadFonts = async () => {
   await Font.loadAsync(
@@ -29,33 +30,23 @@ const loadFonts = async () => {
 
 export const App = () => {
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [authError, setAuthError] = useState(false);
+  const store = useSelector((store) => store);
   const dispatch = useDispatch();
+  console.log("rendering index");
 
-  const loggedIn = useSelector((store) => store.login.loggedIn);
-  console.log(loggedIn);
-
-  const submit = () => {
-    dispatch(sendCredentials(username, password, setAuthError));
-  };
-
-  const renderLoginError = () => {
-    if (!authError) {
-      return;
-    }
-
-    return (
-      <Text style={{ fontFamily: "inter", fontSize: 16, color: "red" }}>
-        Login Failed
-      </Text>
-    );
-  };
+  console.log(store);
 
   useEffect(() => {
     const initializeApp = async () => {
       await loadFonts();
+      try {
+        const token = await getToken();
+        if (token) {
+          dispatch(loginSuccess(token));
+        }
+      } catch (e) {
+        console.log(e);
+      }
       setLoading(false);
     };
 
@@ -70,39 +61,11 @@ export const App = () => {
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      <InputItem
-        error={authError}
-        style={{ fontFamily: "inter" }}
-        value={username}
-        placeholder="username"
-        onChange={(value) => setUsername(value)}
-        type="text"
-      />
-      <InputItem
-        style={{ fontFamily: "inter" }}
-        type="password"
-        value={password}
-        placeholder="password"
-        onChange={(value) => setPassword(value)}
-      />
-      {renderLoginError()}
-      <Button style={{ margin: 12 }} onPress={() => submit()}>
-        <Text style={{ fontFamily: "inter" }}>Submit</Text>
-      </Button>
-    </View>
-  );
-};
+  if (!store.login.token) {
+    return <Login />;
+  }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+  return <SaleMenu />;
+};
 
 export default App;

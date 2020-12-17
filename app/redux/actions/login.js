@@ -1,7 +1,13 @@
-import { api } from "../../utils";
+import { api, saveToken } from "../../utils";
 
 export const loginSuccess = (token) => {
   return { type: "LOGIN_SUCCESS", token };
+};
+
+export const logout = () => {
+  console.log("inside logout action");
+  saveToken("");
+  return { type: "LOGOUT" };
 };
 
 export const sendCredentials = (username, password, setAuthError) => (
@@ -10,7 +16,7 @@ export const sendCredentials = (username, password, setAuthError) => (
   api
     .post("/login/", { username, password })
     .then((response) => {
-      console.log(response.data.token);
+      saveToken(response.data.token);
       dispatch(loginSuccess(response.data.token));
     })
     .catch((err) => {
